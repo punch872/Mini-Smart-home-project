@@ -1,0 +1,1 @@
+# Mini Smart home project
