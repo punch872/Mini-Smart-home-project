@@ -18,6 +18,16 @@ void setup()
   lcd.backlight(); //open the backlight 
   Serial.begin(9600);
 }
+void Drive(float Tc){
+  if (Tc > 30.00) {
+   //mortor on 
+   
+  }
+  else {
+    //motor off
+    
+  }
+}
 void loop()
 {
   Vo = analogRead(ThermistorPin);
