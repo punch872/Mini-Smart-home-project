@@ -5,6 +5,10 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define analogPin A0 //the thermistor attach to 
 #define beta 3950 //the beta of the thermistor
 #define resistance 10 //the value of the pull-up resistor
+//light sensor val 
+int sensorPin = A0; // select the input pin for LDR 
+int sensorValue = 0; // variable to store the value coming from the sensor
+//Temp Sensors val
 int ThermistorPin = 0;
 const int motorPin = 3 ;
 int Vo;
@@ -19,6 +23,11 @@ void setup()
   lcd.backlight(); //open the backlight 
   Serial.begin(9600);
   pinMode(motorPin,OUTPUT);
+}
+int light(){
+sensorValue = analogRead(sensorPin); // read the value from the sensor 
+Serial.println(sensorValue); //prints the values coming from the sensor on the screen 
+delay(500); 
 }
 void Drive(float Tc){
   if (Tc >= 28.00) {
@@ -51,18 +60,17 @@ void loop()
   Serial.println(Tf); 
   Serial.println("");
   // Print a message of "Temp: "to the LCD.
+  lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+  lcd.print("Home Sweet Home");
   lcd.setCursor(0, 1);// set the cursor to column 0, line 0
   lcd.print("Temp: "); // Print a message of "Temp: "to the LCD.
   lcd.print(Tc); // Print a centigrade temperature to the LCD.
   // Print the unit of the centigrade temperature to the LCD.
   lcd.write(char(223));
   lcd.print("C");//print the unit" ℃ "
-  lcd.setCursor(0, 0);// set the cursor to column 0, line 1
-  lcd.print("Home Sweet Home");
-//  lcd.print(Tf);// Print a Fahrenheit temperature to the LCD.
-//  lcd.write(char(223)); // Print the unit of the Fahrenheit temperature to the LCD.
-//  lcd.print(" F");//print the unit"°F"
   delay(200); //wait for 100 milliseconds
+  //call Functuion
   Drive(Tc);
+  light();
 }
  
