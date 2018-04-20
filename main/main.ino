@@ -3,12 +3,15 @@
 #include <LiquidCrystal_I2C.h>
 // initialize the library with the numbers of the interface pins
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-#define analogPin A0 //the thermistor attach to 
+#define analogPin A2 //the thermistor attach to 
 #define beta 3950 //the beta of the thermistor
 #define resistance 10 //the value of the pull-up resistor
+
 //light sensor val 
 int sensorPin = A0; // select the input pin for LDR 
 int sensorValue = 0; // variable to store the value coming from the sensor
+unsigned int rd;
+
 //Temp Sensors val
 int ThermistorPin = 2;
 const int motorPin = 3 ;
@@ -16,6 +19,7 @@ int Vo;
 float R1 = 10000;
 float logR2, R2, T, Tc, Tf; //value of each Temerature
 float c1 = 1.009249522e-03, c2 = 2.378405444e-04, c3 = 2.019202697e-07;
+
 //alarm val
 const int ledPin = 13;
 const int buzzerPin = 12;
@@ -35,10 +39,20 @@ void setup()
 }
 
 int light(){
+rd = analogRead(A1);
+analogWrite(9,rd/4);
 sensorValue = analogRead(sensorPin); // read the value from the sensor 
-Serial.println(sensorValue); //prints the values coming from the sensor on the screen 
-delay(500); 
+  if(sensorValue<155){
+    Serial.println("SENSOR <100 ALERT!!!!");
+    analogWrite(9,rd/4);
+  }else{
+    digitalWrite(9,0);
+  }
+  Serial.println(sensorValue); //prints the values coming from the sensor on the screen 
+  delay(125); 
 }
+
+
 void Drive(float Tc){
   if (Tc >= 28.00) {
    //mortor on when it's hot
@@ -107,12 +121,9 @@ void ledDisplay(){
 }
 void loop(){
   //calling functions
- do {alarm();
- 
- } while(1);{
+  alarm();
   ledDisplay(); 
   Drive(Tc);
   light();
  }
-}
  
