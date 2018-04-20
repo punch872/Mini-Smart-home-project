@@ -27,18 +27,19 @@ const int ldrPin = A1;
 
 void setup()
 {
-  // set up the LCD's number of columns and rows: 
-  lcd.begin();
-  lcd.backlight(); //open the backlight 
-  Serial.begin(9600);
-  pinMode(motorPin,OUTPUT);
+    // set up the LCD's number of columns and rows:
+    lcd.begin();
+    lcd.backlight(); //open the backlight
+    Serial.begin(9600);
+    pinMode(motorPin,OUTPUT);
 //alarm pin mode 
-  pinMode(ledPin, OUTPUT);
-  pinMode(buzzerPin, OUTPUT);
-  pinMode(ldrPin, INPUT);
+    pinMode(ledPin, OUTPUT);
+    pinMode(buzzerPin, OUTPUT);
+    pinMode(ldrPin, INPUT);
 }
 
 int light(){
+<<<<<<< HEAD
 rd = analogRead(A1);
 analogWrite(9,rd/4);
 sensorValue = analogRead(sensorPin); // read the value from the sensor 
@@ -50,80 +51,95 @@ sensorValue = analogRead(sensorPin); // read the value from the sensor
   }
   Serial.println(sensorValue); //prints the values coming from the sensor on the screen 
   delay(125); 
+=======
+    sensorValue = analogRead(sensorPin); // read the value from the sensor
+    Serial.println(sensorValue); //prints the values coming from the sensor on the screen
+    delay(500);
+>>>>>>> 661b383d842cdf1e23c15db7175d11131f2e53ad
 }
 
 
 void Drive(float Tc){
-  if (Tc >= 28.00) {
-   //mortor on when it's hot
-   digitalWrite(motorPin, HIGH);
-  }
-  else if (Tc < 28 && Tc >= 24 ){
-   //slow down
-   analogWrite(motorPin,80);
-  }
-  else if(Tc<23)  {
-    //motor off when temp is cold
-    digitalWrite(motorPin, LOW); 
-  }
-  else {
-    digitalWrite(motorPin, LOW); 
-  }
+    if (Tc >= 28.00) {
+        //mortor on when it's hot
+        digitalWrite(motorPin, HIGH);
+    }
+    else if (Tc < 28 && Tc >= 24 ){
+        //slow down
+        analogWrite(motorPin,80);
+    }
+    else if(Tc<23)  {
+        //motor off when temp is cold
+        digitalWrite(motorPin, LOW);
+    }
+    else {
+        digitalWrite(motorPin, LOW);
+    }
 }
 void alarm(){
-  //set pin numbers
+    //set pin numbers
 
-  int ldrStatus = analogRead(ldrPin);  //read the state of the LDR value
+    int ldrStatus = analogRead(ldrPin);  //read the state of the LDR value
 
-  if (ldrStatus >= 400) {
+    if (ldrStatus >= 400) {
+//on blink
+        tone(buzzerPin, 1000);
+        digitalWrite(ledPin, HIGH);
+        delay(100);
 
-    tone(buzzerPin, 1000);
-    digitalWrite(ledPin, HIGH);
-    delay(100);
+        noTone(buzzerPin);
+        digitalWrite(ledPin, LOW);
+        delay(100);
+//off blink
+        Serial.println("----------- ALARM ACTIVATED -----------");
+    }
+    else {
+        noTone(buzzerPin);
+        digitalWrite(ledPin, LOW);
 
-    noTone(buzzerPin);
-    digitalWrite(ledPin, LOW);
-    delay(100);
-
-    Serial.println("----------- ALARM ACTIVATED -----------"); 
-  }
-  else {
-    noTone(buzzerPin);
-    digitalWrite(ledPin, LOW);
-
-    Serial.println("ALARM DEACTIVATED");
-  }
+        Serial.println("ALARM DEACTIVATED");
+    }
 }
 void ledDisplay(){
-  //setup and display temperature
-  Vo = analogRead(ThermistorPin);
-  R2 = R1 * (1023.0 / (float)Vo - 1.0);
-  logR2 = log(R2);
-  T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
-  Tc = T - 273.15;
-  Tf = (Tc * 9.0)/ 5.0 + 32.0; 
-  Serial.print("Centigrade ");
-  Serial.println(Tc); 
-  Serial.print("Fahrenheit ");
-  Serial.println(Tf); 
-  Serial.println("");
-  // Print a message of "Temp: "to the LCD.
-  lcd.setCursor(0, 0);// set the cursor to column 0, line 1
-  lcd.print("Home Sweet Home");
-  lcd.setCursor(0, 1);// set the cursor to column 0, line 0
-  lcd.print("Temp: "); // Print a message of "Temp: "to the LCD.
-  lcd.print(Tc); // Print a centigrade temperature to the LCD.
-  // Print the unit of the centigrade temperature to the LCD.
-  lcd.write(char(223));
-  lcd.print("C");//print the unit" ℃ "
-  delay(200); //wait for 100 milliseconds
-  //call Functuion
+    //setup and display temperature
+    Vo = analogRead(ThermistorPin);
+    R2 = R1 * (1023.0 / (float)Vo - 1.0);
+    logR2 = log(R2);
+    T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
+    Tc = T - 273.15;
+    Tf = (Tc * 9.0)/ 5.0 + 32.0;
+    Serial.print("Centigrade ");
+    Serial.println(Tc);
+    Serial.print("Fahrenheit ");
+    Serial.println(Tf);
+    Serial.println("");
+    // Print a message of "Temp: "to the LCD.
+    lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+    lcd.print("Home Sweet Home");
+    lcd.setCursor(0, 1);// set the cursor to column 0, line 0
+    lcd.print("Temp: "); // Print a message of "Temp: "to the LCD.
+    lcd.print(Tc); // Print a centigrade temperature to the LCD.
+    // Print the unit of the centigrade temperature to the LCD.
+    lcd.write(char(223));
+    lcd.print("C");//print the unit" ℃ "
+    delay(200); //wait for 100 milliseconds
+    //call Functuion
 }
 void loop(){
+<<<<<<< HEAD
   //calling functions
   alarm();
   ledDisplay(); 
   Drive(Tc);
   light();
  }
+=======
+    //calling functions
+    do {alarm();
+    } while(alarm()==false);
+    ledDisplay();
+    Drive(Tc);
+    light();
+}
+>>>>>>> 661b383d842cdf1e23c15db7175d11131f2e53ad
  
