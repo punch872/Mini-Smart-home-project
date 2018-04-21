@@ -39,23 +39,20 @@ void setup()
 }
 
 int light(){
-<<<<<<< HEAD
 rd = analogRead(A1);
 analogWrite(9,rd/4);
-sensorValue = analogRead(sensorPin); // read the value from the sensor 
+sensorValue = analogRead(sensorPin); // read the value from the sensor
+
   if(sensorValue<155){
-    Serial.println("SENSOR <100 ALERT!!!!");
+    Serial.println("SENSOR <155 ALERT!!!!");
     analogWrite(9,rd/4);
   }else{
     digitalWrite(9,0);
   }
-  Serial.println(sensorValue); //prints the values coming from the sensor on the screen 
-  delay(125); 
-=======
-    sensorValue = analogRead(sensorPin); // read the value from the sensor
     Serial.println(sensorValue); //prints the values coming from the sensor on the screen
     delay(500);
->>>>>>> 661b383d842cdf1e23c15db7175d11131f2e53ad
+
+
 }
 
 
@@ -126,14 +123,6 @@ void ledDisplay(){
     //call Functuion
 }
 void loop(){
-<<<<<<< HEAD
-  //calling functions
-  alarm();
-  ledDisplay(); 
-  Drive(Tc);
-  light();
- }
-=======
     //calling functions
     do {alarm();
     } while(alarm()==false);
@@ -141,5 +130,5 @@ void loop(){
     Drive(Tc);
     light();
 }
->>>>>>> 661b383d842cdf1e23c15db7175d11131f2e53ad
+
  
