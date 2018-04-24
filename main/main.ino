@@ -42,8 +42,11 @@ void setup()
 
 int light(){
 <<<<<<< HEAD
+<<<<<<< HEAD
 rd = analogRead(ldrPin);
 =======
+=======
+>>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
 rd = analogRead(A1);
 >>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
 analogWrite(9,rd/4);
@@ -56,11 +59,17 @@ sensorValue = analogRead(sensorPin); // read the value from the sensor
     digitalWrite(9,0);
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
     Serial.println(sensorValue); //prints the values coming from the sensor on the screen
     delay(500);
 
 
+<<<<<<< HEAD
+>>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
+=======
 >>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
 }
 
@@ -166,6 +175,9 @@ void loop(){
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
  
 >>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
