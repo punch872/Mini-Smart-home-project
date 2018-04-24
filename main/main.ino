@@ -1,12 +1,13 @@
 #include <Wire.h>
 #include <LiquidCrystal.h>
 #include <LiquidCrystal_I2C.h>
+#include <Keypad.h>
 // initialize the library with the numbers of the interface pins
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define analogPin A2 //the thermistor attach to 
 #define beta 3950 //the beta of the thermistor
 #define resistance 10 //the value of the pull-up resistor
-
+#define Password_Length 5 // password range
 //light sensor val 
 int sensorPin = A0; // select the input pin for LDR 
 int sensorValue = 0; // variable to store the value coming from the sensor
@@ -27,6 +28,27 @@ const int ldrPin = A1;
 const int ldrPin2 = A3;
 boolean alarmOn=true;
 boolean thief=false;
+
+//keypad
+
+char Data[Password_Length]; 
+char Master[Password_Length] = "1234"; 
+byte data_count = 0, master_count = 0;
+char customKey;
+
+const byte ROWS = 4; //four rows
+const byte COLS = 4; //four columns
+char keys[ROWS][COLS] = {
+  {'1','2','3','A'},
+  {'4','5','6','B' },
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
+byte colPins[ROWS] = {28, 26, 24, 22}; //connect to the row pinouts of the keypad
+byte rowPins[COLS] = {36, 34, 32, 30}; //connect to the column pinouts of the keypad
+Keypad customKeypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
+//Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+
 void setup()
 {
     // set up the LCD's number of columns and rows:
@@ -41,14 +63,8 @@ void setup()
 }
 
 int light(){
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 rd = analogRead(ldrPin);
-=======
-=======
->>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
-rd = analogRead(A1);
->>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
 analogWrite(9,rd/4);
 sensorValue = analogRead(sensorPin); // read the value from the sensor
 
@@ -58,19 +74,10 @@ sensorValue = analogRead(sensorPin); // read the value from the sensor
   }else{
     digitalWrite(9,0);
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
+
     Serial.println(sensorValue); //prints the values coming from the sensor on the screen
     delay(500);
 
-
-<<<<<<< HEAD
->>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
-=======
->>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
 }
 
 
@@ -92,23 +99,23 @@ void Drive(float Tc){
     }
 }
 void alarm(){
-    //set pin numbers
-
-      
-  //ldrStatus >= 400
       while(thief) {
-  //on blink
+          passcode();
           tone(buzzerPin, 1000);
+          passcode();
           digitalWrite(ledPin, HIGH);
+          passcode();
           delay(100);
-  
+          passcode();
           noTone(buzzerPin);
+          passcode();
           digitalWrite(ledPin, LOW);
+          passcode();
           delay(100);
-
-          
-  //off blink
+          passcode();
+          //off blink
           Serial.println("----------- ALARM ACTIVATED -----------");
+          passcode();
           //if(password to unactivate alarm ){theif =false;}
       }
     }
@@ -120,9 +127,9 @@ float getTemp(){
     logR2 = log(R2);
     T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
     Tc = T - 273.15;
-    Tf = (Tc * 9.0)/ 5.0 + 32.0;
-    
+    Tf = (Tc * 9.0)/ 5.0 + 32.0;   
 }
+
 void firstLcd(){
   int ldrStatus = analogRead(ldrPin2);  //read the state of the LDR value
   while(alarmOn=!alarmOn){
@@ -140,18 +147,18 @@ void firstLcd(){
     // Print the unit of the centigrade temperature to the LCD.
     lcd.write(char(223));
     lcd.print("C");//print the unit" ℃ "
-    Serial.println(ldrStatus);
+    
     delay(5000); //wait for 100 milliseconds
     //call Functuion
     lcd.clear();
     lcd.setCursor(0, 0);// set the cursor to column 0, line 1
     lcd.print("Test1");
-    lcd.setCursor(0, 1);// set the cursor to column 0, line 0
+    lcd.setCursor(0, 1);// set the cursor to column 0, line 0  
     lcd.print("Test2"); // Print a message of "Temp: "to the LCD.
     delay(5000);
 
 
-    
+    Serial.println(ldrStatus);
     if(ldrStatus <= 400){ //LDR detect thief
       thief=true;
       lcd.clear();
@@ -160,13 +167,50 @@ void firstLcd(){
       break;
      
   
-  }
+    }
+
+ 
  
   }
-}  
+}
+void passcode(){
+
+  char customKey = customKeypad.getKey(); //get key from keypad one by one
+  if (customKey){//if recieve key
+    Data[data_count] = customKey; //put 'customKey' in array "Data" at Index = 'data_count'
+    lcd.setCursor(data_count,1); 
+    lcd.print(Data[data_count]); 
+    data_count++; //go to next character
+    }
+
+  if(data_count == Password_Length-1){ // if write all passcode character
+    
+    if(!strcmp(Data, Master)){ // if passcode CORRECT
+        thief=false; //BREAK THE WHILE-LOOP
+      }
+    else{ //if passcode INCORRECT
+      lcd.setCursor(0, 1); // set the cursor to column 0, line 1
+      delay(100);
+      lcd.print("INCORRECT !!!");
+      delay(200);
+      }
+    
+    clearData();//clear all password array
+    lcd.clear();
+    lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+    lcd.print("Intruder!!!");
+  }
+}
+
+void clearData(){ //for clear passward 
+  while(data_count !=0){
+    Data[data_count--] = 0; 
+  }
+  return;
+}
+  
 void loop(){
     //calling functions
-    
     getTemp();
     firstLcd();
     alarm();
@@ -174,10 +218,4 @@ void loop(){
     light();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
- 
->>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
+
