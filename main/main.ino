@@ -24,7 +24,9 @@ float c1 = 1.009249522e-03, c2 = 2.378405444e-04, c3 = 2.019202697e-07;
 const int ledPin = 13;
 const int buzzerPin = 12;
 const int ldrPin = A1;
-
+const int ldrPin2 = A3;
+boolean alarmOn=true;
+boolean thief=false;
 void setup()
 {
     // set up the LCD's number of columns and rows:
@@ -40,22 +42,26 @@ void setup()
 
 int light(){
 <<<<<<< HEAD
+rd = analogRead(ldrPin);
+=======
 rd = analogRead(A1);
+>>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
 analogWrite(9,rd/4);
-sensorValue = analogRead(sensorPin); // read the value from the sensor 
+sensorValue = analogRead(sensorPin); // read the value from the sensor
+
   if(sensorValue<155){
-    Serial.println("SENSOR <100 ALERT!!!!");
+    Serial.println("SENSOR <155 ALERT!!!!");
     analogWrite(9,rd/4);
   }else{
     digitalWrite(9,0);
   }
-  Serial.println(sensorValue); //prints the values coming from the sensor on the screen 
-  delay(125); 
+<<<<<<< HEAD
 =======
-    sensorValue = analogRead(sensorPin); // read the value from the sensor
     Serial.println(sensorValue); //prints the values coming from the sensor on the screen
     delay(500);
->>>>>>> 661b383d842cdf1e23c15db7175d11131f2e53ad
+
+
+>>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
 }
 
 
@@ -79,28 +85,26 @@ void Drive(float Tc){
 void alarm(){
     //set pin numbers
 
-    int ldrStatus = analogRead(ldrPin);  //read the state of the LDR value
+      
+  //ldrStatus >= 400
+      while(thief) {
+  //on blink
+          tone(buzzerPin, 1000);
+          digitalWrite(ledPin, HIGH);
+          delay(100);
+  
+          noTone(buzzerPin);
+          digitalWrite(ledPin, LOW);
+          delay(100);
 
-    if (ldrStatus >= 400) {
-//on blink
-        tone(buzzerPin, 1000);
-        digitalWrite(ledPin, HIGH);
-        delay(100);
-
-        noTone(buzzerPin);
-        digitalWrite(ledPin, LOW);
-        delay(100);
-//off blink
-        Serial.println("----------- ALARM ACTIVATED -----------");
+          
+  //off blink
+          Serial.println("----------- ALARM ACTIVATED -----------");
+          //if(password to unactivate alarm ){theif =false;}
+      }
     }
-    else {
-        noTone(buzzerPin);
-        digitalWrite(ledPin, LOW);
 
-        Serial.println("ALARM DEACTIVATED");
-    }
-}
-void ledDisplay(){
+float getTemp(){
     //setup and display temperature
     Vo = analogRead(ThermistorPin);
     R2 = R1 * (1023.0 / (float)Vo - 1.0);
@@ -108,6 +112,11 @@ void ledDisplay(){
     T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
     Tc = T - 273.15;
     Tf = (Tc * 9.0)/ 5.0 + 32.0;
+    
+}
+void firstLcd(){
+  int ldrStatus = analogRead(ldrPin2);  //read the state of the LDR value
+  while(alarmOn=!alarmOn){
     Serial.print("Centigrade ");
     Serial.println(Tc);
     Serial.print("Fahrenheit ");
@@ -122,24 +131,41 @@ void ledDisplay(){
     // Print the unit of the centigrade temperature to the LCD.
     lcd.write(char(223));
     lcd.print("C");//print the unit" ℃ "
-    delay(200); //wait for 100 milliseconds
+    Serial.println(ldrStatus);
+    delay(5000); //wait for 100 milliseconds
     //call Functuion
-}
+    lcd.clear();
+    lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+    lcd.print("Test1");
+    lcd.setCursor(0, 1);// set the cursor to column 0, line 0
+    lcd.print("Test2"); // Print a message of "Temp: "to the LCD.
+    delay(5000);
+
+
+    
+    if(ldrStatus <= 400){ //LDR detect thief
+      thief=true;
+      lcd.clear();
+      lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+      lcd.print("Intruder!!!");
+      break;
+     
+  
+  }
+ 
+  }
+}  
 void loop(){
-<<<<<<< HEAD
-  //calling functions
-  alarm();
-  ledDisplay(); 
-  Drive(Tc);
-  light();
- }
-=======
     //calling functions
-    do {alarm();
-    } while(alarm()==false);
-    ledDisplay();
+    
+    getTemp();
+    firstLcd();
+    alarm();
     Drive(Tc);
     light();
 }
->>>>>>> 661b383d842cdf1e23c15db7175d11131f2e53ad
+
+<<<<<<< HEAD
+=======
  
+>>>>>>> 3272763686eb8e9308b7fdff298c531b592cdf31
