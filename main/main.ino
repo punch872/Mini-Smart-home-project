@@ -15,7 +15,8 @@ unsigned int rd;
 
 //Temp Sensors val
 int ThermistorPin = 2;
-const int motorPin = 3 ;
+const int motorPinL = 3 ;
+const int motorPinR = 4 ;
 int Vo;
 float R1 = 10000;
 float logR2, R2, T, Tc, Tf; //value of each Temerature
@@ -55,7 +56,8 @@ void setup()
     lcd.begin();
     lcd.backlight(); //open the backlight
     Serial.begin(9600);
-    pinMode(motorPin,OUTPUT);
+    pinMode(motorPinL,OUTPUT);
+    pinMode(motorPinR,OUTPUT);
 //alarm pin mode 
     pinMode(ledPin, OUTPUT);
     pinMode(buzzerPin, OUTPUT);
@@ -84,18 +86,22 @@ sensorValue = analogRead(sensorPin); // read the value from the sensor
 void Drive(float Tc){
     if (Tc >= 28.00) {
         //mortor on when it's hot
-        digitalWrite(motorPin, HIGH);
+        digitalWrite(motorPinL, HIGH);
+        digitalWrite(motorPinR,HIGH);
     }
     else if (Tc < 28 && Tc >= 24 ){
         //slow down
-        analogWrite(motorPin,80);
+        analogWrite(motorPinL,80);
+        analogWrite(motorPinR,80);
     }
     else if(Tc<23)  {
         //motor off when temp is cold
-        digitalWrite(motorPin, LOW);
+        digitalWrite(motorPinL, LOW);
+        digitalWrite(motorPinR, LOW);
     }
     else {
-        digitalWrite(motorPin, LOW);
+        digitalWrite(motorPinL, LOW);
+        digitalWrite(motorPinR, LOW);
     }
 }
 void alarm(){
@@ -159,7 +165,7 @@ void firstLcd(){
 
 
     Serial.println(ldrStatus);
-    if(ldrStatus <= 400){ //LDR detect thief
+    if(ldrStatus <= 140){ //LDR detect thief
       thief=true;
       lcd.clear();
       lcd.setCursor(0, 0);// set the cursor to column 0, line 1
