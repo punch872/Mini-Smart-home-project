@@ -84,11 +84,15 @@ sensorValue = analogRead(sensorPin); // read the value from the sensor
 
 
 void Drive(float Tc){
+  
     if (Tc >= 28.00) {
         //mortor on when it's hot
         digitalWrite(motorPinL, HIGH);
         digitalWrite(motorPinR,HIGH);
-    }
+        Serial.println(motorPinL);  
+        Serial.println(motorPinR);  
+          
+        }
     else if (Tc < 28 && Tc >= 24 ){
         //slow down
         analogWrite(motorPinL,80);
@@ -104,6 +108,8 @@ void Drive(float Tc){
         digitalWrite(motorPinR, LOW);
     }
 }
+
+
 void alarm(){
       while(thief) {
           passcode();
@@ -154,14 +160,50 @@ void firstLcd(){
     lcd.write(char(223));
     lcd.print("C");//print the unit" ℃ "
     
-    delay(5000); //wait for 100 milliseconds
+    delay(3000); //wait for 100 milliseconds
     //call Functuion
     lcd.clear();
-    lcd.setCursor(0, 0);// set the cursor to column 0, line 1
-    lcd.print("Test1");
+   
+    if(sensorValue >= 400){
+    lcd.setCursor(0, 0);// set the cursor to column 0, line 1  
+    lcd.print("It's Day Time");
+    }
+    else{
+    lcd.setCursor(0, 0);// set the cursor to column 0, line 1  
+    lcd.print("It's Night time");
+    }
     lcd.setCursor(0, 1);// set the cursor to column 0, line 0  
-    lcd.print("Test2"); // Print a message of "Temp: "to the LCD.
-    delay(5000);
+    lcd.print("Secured"); // Print a message of "Temp: "to the LCD.
+    lcd.setCursor(7, 1);// set the cursor to column 0, line 0  
+    lcd.print("."); // Print a message of "Temp: "to the LCD.
+     if(ldrStatus <= 140){ //LDR detect thief
+      thief=true;
+      lcd.clear();
+      lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+      lcd.print("Intruder!!!");
+      break;
+    }
+    delay(1250);
+    lcd.setCursor(8, 1);// set the cursor to column 0, line 0  
+    lcd.print("."); // Print a message of "Temp: "to the LCD.
+     if(ldrStatus <= 140){ //LDR detect thief
+      thief=true;
+      lcd.clear();
+      lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+      lcd.print("Intruder!!!");
+      break;
+    }
+     delay(1250);
+    lcd.setCursor(9, 1);// set the cursor to column 0, line 0  
+    lcd.print("."); // Print a message of "Temp: "to the LCD
+     if(ldrStatus <= 140){ //LDR detect thief
+      thief=true;
+      lcd.clear();
+      lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+      lcd.print("Intruder!!!");
+      break;
+    }
+    delay(1250);
 
 
     Serial.println(ldrStatus);
@@ -171,8 +213,6 @@ void firstLcd(){
       lcd.setCursor(0, 0);// set the cursor to column 0, line 1
       lcd.print("Intruder!!!");
       break;
-     
-  
     }
 
  
