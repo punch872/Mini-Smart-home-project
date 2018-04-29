@@ -228,6 +228,7 @@ void passcode(){
     lcd.print(Data[data_count]); 
     data_count++; //go to next character
     }
+    
 
   if(data_count == Password_Length-1){ // if write all passcode character
     
