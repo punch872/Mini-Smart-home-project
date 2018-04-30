@@ -52,8 +52,8 @@ Keypad customKeypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 //Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 //wifi
-const int GPIO_0 = A6;
-const int GPIO_2 = A7;
+const int GPIO_0 =  6;
+const int GPIO_2 =  7;
 //int wifiValue1 = analogRead(GPIO_0);
 //int wifiValue2= analogRead(GPIO_2);
 
@@ -68,18 +68,21 @@ void setup()
     //alarm pin mode
     pinMode(ledPin, OUTPUT);
     pinMode(buzzerPin, OUTPUT);
-    digitalWrite(GPIO_0,HIGH);
-    digitalWrite(GPIO_2,HIGH);
     pinMode(GPIO_0,INPUT);
     pinMode(GPIO_2,INPUT);
 }
 
 int light(){
-  int wifiValue1 = analogRead(GPIO_0);
-  if(wifiValue1 > 400){    
+  int wifiValue1 = digitalRead(GPIO_0);
+  Serial.print("WifiValue1 = ");
+  Serial.println(wifiValue1);
+  sensorValue = analogRead(sensorPin);
+  Serial.print("sensorValue (light) = ");
+  Serial.println(sensorValue);
+  if(wifiValue1 == HIGH){    
     sensorValue = analogRead(sensorPin); // read the value from the sensor
     
-      if(sensorValue<155){
+      if(sensorValue<100){
         analogWrite(9,250);
       }else{
         digitalWrite(9,0);
@@ -94,8 +97,12 @@ int light(){
 
 
 void Drive(float Tc){
-  int wifiValue2 = analogRead(GPIO_0);
-  if(wifiValue2 > 400){
+  int wifiValue2 = digitalRead(GPIO_0);
+  Serial.print("WifiValue2 = ");
+  Serial.println(wifiValue2);
+  if(wifiValue2 == HIGH){
+    Serial.print("Drive_Tc = ");
+    Serial.println(Tc);
  
     if (Tc >= 28.00) {
         //mortor on when it's hot
@@ -148,7 +155,7 @@ void alarmcheck(){
   int ldrStatus = analogRead(ldrPin2);
   Serial.print("ldrStatus = ");
   Serial.println(ldrStatus);
-   if(ldrStatus <= 40 ){ //LDR detect thief
+   if(ldrStatus <= 150 ){ //LDR detect thief
       thief=true;
       lcd.clear();
       lcd.setCursor(0, 0);// set the cursor to column 0, line 1
@@ -160,8 +167,8 @@ void alarmcheck(){
 float getTemp(){
     //setup and display temperature
     Vo = analogRead(ThermistorPin);
-    Serial.print("ThermistorPin = ");
-    Serial.println(ThermistorPin);
+    Serial.print("Vo_getTemp() = ");
+    Serial.println(Vo);
     R2 = R1 * (1023.0 / (float)Vo - 1.0);
     logR2 = log(R2);
     T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
@@ -171,9 +178,9 @@ float getTemp(){
 
 
 void firstLcd(){
-  Serial.print("Centigrade ");
-  Serial.println(Tc);
-  Serial.println("");
+  //Serial.print("Centigrade ");
+  //Serial.println(Tc);
+  //Serial.println("");
   // Print a message of "Temp: "to the LCD.
   lcd.setCursor(0, 0);// set the cursor to column 0, line 1
   lcd.print("Home Sweet Home");
