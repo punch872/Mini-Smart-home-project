@@ -4,12 +4,12 @@
 #include <Keypad.h>
 // initialize the library with the numbers of the interface pins
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-#define analogPin A2 //the thermistor attach to 
+#define analogPin A2 //the thermistor attach to
 #define beta 3950 //the beta of the thermistor
 #define resistance 10 //the value of the pull-up resistor
 #define Password_Length 5 // password range
-//light sensor val 
-int sensorPin = A0; // select the input pin for LDR 
+//light sensor val
+int sensorPin = A0; // select the input pin for LDR
 int sensorValue = 0; // variable to store the value coming from the sensor
 unsigned int rd;
 
@@ -25,15 +25,16 @@ float c1 = 1.009249522e-03, c2 = 2.378405444e-04, c3 = 2.019202697e-07;
 //alarm val
 const int ledPin = 13;
 const int buzzerPin = 12;
-const int ldrPin = A1;
+//const int ldrPin = A1; //NOT USED
 const int ldrPin2 = A3;
 boolean alarmOn=true;
 boolean thief=false;
+int ldrStatus = analogRead(ldrPin2);  //read the state of the LDR value
 
 //keypad
 
-char Data[Password_Length]; 
-char Master[Password_Length] = "1234"; 
+char Data[Password_Length];
+char Master[Password_Length] = "1234";
 byte data_count = 0, master_count = 0;
 char customKey;
 
@@ -58,7 +59,7 @@ void setup()
     Serial.begin(9600);
     pinMode(motorPinL,OUTPUT);
     pinMode(motorPinR,OUTPUT);
-//alarm pin mode 
+    //alarm pin mode
     pinMode(ledPin, OUTPUT);
     pinMode(buzzerPin, OUTPUT);
     pinMode(ldrPin, INPUT);
@@ -69,30 +70,27 @@ int light(){
 rd = analogRead(ldrPin);
 analogWrite(9,rd/4);
 sensorValue = analogRead(sensorPin); // read the value from the sensor
-
+Serial.print("sensorPin = ");
+Serial.println(sensorPin);
   if(sensorValue<155){
     Serial.println("SENSOR <155 ALERT!!!!");
-    analogWrite(9,rd/4);
+    digitalWrite(9,HIGH);
   }else{
     digitalWrite(9,0);
   }
 
     Serial.println(sensorValue); //prints the values coming from the sensor on the screen
     delay(500);
-
 }
 
 
 void Drive(float Tc){
-  
+
     if (Tc >= 28.00) {
         //mortor on when it's hot
         digitalWrite(motorPinL, HIGH);
         digitalWrite(motorPinR,HIGH);
-        Serial.println(motorPinL);  
-        Serial.println(motorPinR);  
-          
-        }
+    }
     else if (Tc < 28 && Tc >= 24 ){
         //slow down
         analogWrite(motorPinL,80);
@@ -126,111 +124,96 @@ void alarm(){
           delay(100);
           passcode();
           //off blink
-          Serial.println("----------- ALARM ACTIVATED -----------");
+          //Serial.println("----------- ALARM ACTIVATED -----------");
           passcode();
           //if(password to unactivate alarm ){theif =false;}
       }
     }
+void alarmcheck(){
+  int ldrStatus = analogRead(ldrPin2);
+  Serial.print("ldrStatus = ");
+  Serial.println(ldrStatus);
+   if(ldrStatus <= 40 ){ //LDR detect thief
+      thief=true;
+      lcd.clear();
+      lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+      lcd.print("Intruder!!!");
+      alarm();
+   }
 
+}
 float getTemp(){
     //setup and display temperature
     Vo = analogRead(ThermistorPin);
+    Serial.print("ThermistorPin = ");
+    Serial.println(ThermistorPin);
     R2 = R1 * (1023.0 / (float)Vo - 1.0);
     logR2 = log(R2);
     T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
     Tc = T - 273.15;
-    Tf = (Tc * 9.0)/ 5.0 + 32.0;   
-}
+    Tf = (Tc * 9.0)/ 5.0 + 32.0;
+  }
+
 
 void firstLcd(){
-  int ldrStatus = analogRead(ldrPin2);  //read the state of the LDR value
-  while(alarmOn=!alarmOn){
-    Serial.print("Centigrade ");
-    Serial.println(Tc);
-    Serial.print("Fahrenheit ");
-    Serial.println(Tf);
-    Serial.println("");
-    // Print a message of "Temp: "to the LCD.
-    lcd.setCursor(0, 0);// set the cursor to column 0, line 1
-    lcd.print("Home Sweet Home");
-    lcd.setCursor(0, 1);// set the cursor to column 0, line 0
-    lcd.print("Temp: "); // Print a message of "Temp: "to the LCD.
-    lcd.print(Tc); // Print a centigrade temperature to the LCD.
-    // Print the unit of the centigrade temperature to the LCD.
-    lcd.write(char(223));
-    lcd.print("C");//print the unit" ℃ "
-    
-    delay(3000); //wait for 100 milliseconds
-    //call Functuion
-    lcd.clear();
-   
-    if(sensorValue >= 400){
-    lcd.setCursor(0, 0);// set the cursor to column 0, line 1  
-    lcd.print("It's Day Time");
-    }
-    else{
-    lcd.setCursor(0, 0);// set the cursor to column 0, line 1  
-    lcd.print("It's Night time");
-    }
-    lcd.setCursor(0, 1);// set the cursor to column 0, line 0  
-    lcd.print("Secured"); // Print a message of "Temp: "to the LCD.
-    lcd.setCursor(7, 1);// set the cursor to column 0, line 0  
-    lcd.print("."); // Print a message of "Temp: "to the LCD.
-     if(ldrStatus <= 140){ //LDR detect thief
-      thief=true;
-      lcd.clear();
-      lcd.setCursor(0, 0);// set the cursor to column 0, line 1
-      lcd.print("Intruder!!!");
-      break;
-    }
-    delay(1250);
-    lcd.setCursor(8, 1);// set the cursor to column 0, line 0  
-    lcd.print("."); // Print a message of "Temp: "to the LCD.
-     if(ldrStatus <= 140){ //LDR detect thief
-      thief=true;
-      lcd.clear();
-      lcd.setCursor(0, 0);// set the cursor to column 0, line 1
-      lcd.print("Intruder!!!");
-      break;
-    }
-     delay(1250);
-    lcd.setCursor(9, 1);// set the cursor to column 0, line 0  
-    lcd.print("."); // Print a message of "Temp: "to the LCD
-     if(ldrStatus <= 140){ //LDR detect thief
-      thief=true;
-      lcd.clear();
-      lcd.setCursor(0, 0);// set the cursor to column 0, line 1
-      lcd.print("Intruder!!!");
-      break;
-    }
-    delay(1250);
+  Serial.print("Centigrade ");
+  Serial.println(Tc);
+  Serial.println("");
+  // Print a message of "Temp: "to the LCD.
+  lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+  lcd.print("Home Sweet Home");
+  lcd.setCursor(0, 1);// set the cursor to column 0, line 0
+  lcd.print("Temp: "); // Print a message of "Temp: "to the LCD.
+  lcd.print(Tc); // Print a centigrade temperature to the LCD.
+  // Print the unit of the centigrade temperature to the LCD.
+  lcd.write(char(223));
+  lcd.print("C");//print the unit" ℃ "
 
+  delay(3000); //wait for 100 milliseconds
+  //call Functuion
+  lcd.clear();
 
-    Serial.println(ldrStatus);
-    if(ldrStatus <= 140){ //LDR detect thief
-      thief=true;
-      lcd.clear();
-      lcd.setCursor(0, 0);// set the cursor to column 0, line 1
-      lcd.print("Intruder!!!");
-      break;
-    }
-
- 
- 
+  if(sensorValue >= 400){
+  lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+  lcd.print("It's Day Time");
   }
+  else{
+  lcd.setCursor(0, 0);// set the cursor to column 0, line 1
+  lcd.print("It's Night time");
+  }
+  lcd.setCursor(0, 1);// set the cursor to column 0, line 0
+  lcd.print("Secured"); // Print a message of "Temp: "to the LCD.
+  lcd.setCursor(7, 1);// set the cursor to column 0, line 0
+  lcd.print("."); // Print a message of "Temp: "to the LCD.
+  alarmcheck();
+  delay(1250);
+  lcd.setCursor(8, 1);// set the cursor to column 0, line 0
+  lcd.print("."); // Print a message of "Temp: "to the LCD.
+  alarmcheck();
+  delay(1250);
+  lcd.setCursor(9, 1);// set the cursor to column 0, line 0
+  alarmcheck();
+  lcd.print(".");
+  alarmcheck();
+  delay(1250);
+  Serial.println(ldrStatus);
+
+
+
+
 }
 void passcode(){
 
   char customKey = customKeypad.getKey(); //get key from keypad one by one
   if (customKey){//if recieve key
     Data[data_count] = customKey; //put 'customKey' in array "Data" at Index = 'data_count'
-    lcd.setCursor(data_count,1); 
-    lcd.print(Data[data_count]); 
+    lcd.setCursor(data_count,1);
+    lcd.print("*");
     data_count++; //go to next character
     }
 
   if(data_count == Password_Length-1){ // if write all passcode character
-    
+
     if(!strcmp(Data, Master)){ // if passcode CORRECT
         thief=false; //BREAK THE WHILE-LOOP
       }
@@ -240,7 +223,7 @@ void passcode(){
       lcd.print("INCORRECT !!!");
       delay(200);
       }
-    
+
     clearData();//clear all password array
     lcd.clear();
     lcd.setCursor(0, 0);// set the cursor to column 0, line 1
@@ -248,20 +231,18 @@ void passcode(){
   }
 }
 
-void clearData(){ //for clear passward 
+void clearData(){ //for clear passward
   while(data_count !=0){
-    Data[data_count--] = 0; 
+    Data[data_count--] = 0;
   }
   return;
 }
-  
+
 void loop(){
     //calling functions
     getTemp();
     firstLcd();
-    alarm();
     Drive(Tc);
     light();
-}
-
+    }
 
