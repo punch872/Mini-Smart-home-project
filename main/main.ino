@@ -51,6 +51,12 @@ byte rowPins[COLS] = {36, 34, 32, 30}; //connect to the column pinouts of the ke
 Keypad customKeypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 //Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
+//wifi
+const int GPIO_0 = A6;
+const int GPIO_2 = A7;
+//int wifiValue1 = analogRead(GPIO_0);
+//int wifiValue2= analogRead(GPIO_2);
+
 void setup()
 {
     // set up the LCD's number of columns and rows:
@@ -63,34 +69,43 @@ void setup()
     pinMode(ledPin, OUTPUT);
     pinMode(buzzerPin, OUTPUT);
     pinMode(ldrPin, INPUT);
+    digitalWrite(GPIO_0,HIGH);
+    digitalWrite(GPIO_2,HIGH);
+    pinMode(GPIO_0,INPUT);
+    pinMode(GPIO_2,INPUT);
 }
 
 int light(){
-
-rd = analogRead(ldrPin);
-analogWrite(9,rd/4);
-sensorValue = analogRead(sensorPin); // read the value from the sensor
-Serial.print("sensorPin = ");
-Serial.println(sensorPin);
-  if(sensorValue<155){
-    Serial.println("SENSOR <155 ALERT!!!!");
-    digitalWrite(9,HIGH);
+  int wifiValue1 = analogRead(GPIO_0);
+  if(wifiValue1 > 400){    
+    
+    rd = analogRead(ldrPin);
+    analogWrite(9,rd/4);
+    sensorValue = analogRead(sensorPin); // read the value from the sensor
+    
+      if(sensorValue<155){
+        analogWrite(9,rd/4);
+      }else{
+        digitalWrite(9,0);
+      }
+    
+        Serial.println(sensorValue); //prints the values coming from the sensor on the screen
+        delay(500);
   }else{
     digitalWrite(9,0);
   }
-
-    Serial.println(sensorValue); //prints the values coming from the sensor on the screen
-    delay(500);
 }
 
 
 void Drive(float Tc){
-
+  int wifiValue2 = analogRead(GPIO_0);
+  if(wifiValue2 > 400){
+ 
     if (Tc >= 28.00) {
         //mortor on when it's hot
         digitalWrite(motorPinL, HIGH);
         digitalWrite(motorPinR,HIGH);
-    }
+        }
     else if (Tc < 28 && Tc >= 24 ){
         //slow down
         analogWrite(motorPinL,80);
@@ -105,6 +120,10 @@ void Drive(float Tc){
         digitalWrite(motorPinL, LOW);
         digitalWrite(motorPinR, LOW);
     }
+  }else{
+    digitalWrite(motorPinL, LOW);
+    digitalWrite(motorPinR, LOW);
+  }
 }
 
 
