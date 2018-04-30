@@ -68,7 +68,6 @@ void setup()
     //alarm pin mode
     pinMode(ledPin, OUTPUT);
     pinMode(buzzerPin, OUTPUT);
-    pinMode(ldrPin, INPUT);
     digitalWrite(GPIO_0,HIGH);
     digitalWrite(GPIO_2,HIGH);
     pinMode(GPIO_0,INPUT);
@@ -78,13 +77,10 @@ void setup()
 int light(){
   int wifiValue1 = analogRead(GPIO_0);
   if(wifiValue1 > 400){    
-    
-    rd = analogRead(ldrPin);
-    analogWrite(9,rd/4);
     sensorValue = analogRead(sensorPin); // read the value from the sensor
     
       if(sensorValue<155){
-        analogWrite(9,rd/4);
+        analogWrite(9,250);
       }else{
         digitalWrite(9,0);
       }
